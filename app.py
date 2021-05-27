@@ -100,6 +100,22 @@ if dividend:
     st.write(dvdf)
 
 
+st.sidebar.markdown(''' 
+** STOCK FILTER **
+
+This webapp is for finding stocks performance from 1 week to last 6 months, you can
+select from the filter given. if you want to look for stocks which are consistantly growing from 
+last 3 months, select the filter Type: `GAINER` Value: `3` Time: `WEEKLY`
+
+Similarly you can also get the stocks who are giving bonus, right , dividend and getting split with record and ex-record date.
+
+This is getting update on near realtime. 
+
+
+*** This is just a web application for those who want to get the information on one page.***
+ ''')
+
+
 st.markdown('''
             ### 
             ---
