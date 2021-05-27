@@ -2,6 +2,10 @@ from pandas.io.html import read_html
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+import time
+
+
+st.image('./image.png', width=700)
 
 
 def color_negative_red(value):
@@ -15,21 +19,24 @@ def color_negative_red(value):
 
 website = "https://munafasutra.com/"
 
-st.header("Stocks Details")
 st.subheader("Gainers/Losers")
 col1, col2, col3, col4 = st.beta_columns(4)
 exch = col1.selectbox("Exchange", ["nse", "bse"])
 stype = col2.selectbox("Type", ["GAINERS", "LOSERS"])
 value = col3.selectbox("Value", [1, 2, 3, 4, 5, 6])
-time = col4.selectbox("Time", ["WEEKLY", "MONTHLY"])
+duration = col4.selectbox("Time", ["WEEKLY", "MONTHLY"])
 
 if value == 0:
-    url = website+"%s/top/%s/%s" % (exch, stype, time)
+    url = website+"%s/top/%s/%s" % (exch, stype, duration)
 else:
-    url = website+"%s/top/%s/%s/%s" % (exch, stype, time, str(value))
+    url = website+"%s/top/%s/%s/%s" % (exch, stype, duration, str(value))
 
 df = st.cache(pd.read_html)(url)[1]
 df = df.rename(columns=df.iloc[0]).drop(df.index[0])
+my_bar = st.progress(0)
+for complete in range(100):
+    my_bar.progress(complete + 1)
+    time.sleep(0.001)
 st.dataframe(df.style.applymap(color_negative_red, subset=[
     'Change Percent']))
 
@@ -47,22 +54,55 @@ def get_data(type):
     return df
 
 
+st.markdown(''' --- ''')
 bonus = st.checkbox("Bonus Details")
 if bonus:
+    my_bar = st.progress(0)
+    bonusDF = get_data('bonus')
+    for complete in range(100):
+        my_bar.progress(complete + 1)
+        time.sleep(0.001)
     st.subheader("Bonus Decleared")
-    st.write(get_data('bonus'))
+    st.write(bonusDF)
 
+st.markdown(''' --- ''')
 split = st.checkbox("Splits Details")
 if split:
+    my_bar = st.progress(0)
+    splitDF = get_data('splits')
+    for complete in range(100):
+        my_bar.progress(complete + 1)
+        time.sleep(0.001)
     st.subheader("Splits Declared")
-    st.write(get_data('splits'))
+    st.write(splitDF)
 
+st.markdown(''' --- ''')
 right = st.checkbox("Rights Details")
 if right:
+    my_bar = st.progress(0)
+    rightsDF = get_data('rights')
+    for complete in range(100):
+        my_bar.progress(complete + 1)
+        time.sleep(0.001)
     st.subheader("Rights Issues")
-    st.write(get_data('rights'))
+    st.write(rightsDF)
 
+st.markdown(''' --- ''')
 dividend = st.checkbox("Dividend Details")
 if dividend:
+    my_bar = st.progress(0)
+    dvdf = get_data('dividends_declared')
+    for complete in range(100):
+        my_bar.progress(complete + 1)
+        time.sleep(0.001)
+
     st.subheader("Dividends Declared")
-    st.write(get_data('dividends_declared'))
+    st.write(dvdf)
+
+
+st.markdown('''
+            ### 
+            ---
+            \n \n \n \n \n \n 
+             Made by ** Vikas Srivastava **
+            ''')
