@@ -36,10 +36,11 @@ if value == 0:
 else:
     url = website+"%s/top/%s/%s/%s" % (exch, stype, duration, str(value))
 
-df = st.cache(pd.read_html)(url)[1]
+df = pd.read_html(url)[1]
+df.dropna(axis=0, inplace=True)
 df = df.rename(columns=df.iloc[0]).drop(df.index[0])
 # df['ticker'] = df['Company'].apply(lambda x: '<a href="https://in.tradingview.com/symbols/{0}-{1}">{1}</a>'.format(exch, x.split(' ')[0]))
-df['ticker'] = df['Company'].apply(lambda x: x.split(' ')[0])
+df['ticker'] = df['Company'].apply(lambda x: str(x).split(' ')[0])
 df['Change Percent'] = df['Change Percent'].apply(lambda x: x.split(' ')[0])
 df['Company'] = df['Company'].apply(
     lambda x: x.split(' ', 1)[1:][0].strip())
@@ -48,7 +49,7 @@ df = df[df['ticker'].apply(lambda x: search.lower() in x.lower())]
 cols = df.columns.tolist()
 cols = cols[-1:] + cols[:-1]
 df = df[cols]
-df.dropna(axis=1, inplace=True)
+
 my_bar = st.progress(0)
 for complete in range(100):
     my_bar.progress(complete + 1)
