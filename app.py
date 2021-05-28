@@ -36,30 +36,38 @@ if value == 0:
 else:
     url = website+"%s/top/%s/%s/%s" % (exch, stype, duration, str(value))
 
-df = pd.read_html(url)[1]
-df.dropna(axis=0, inplace=True)
-df = df.rename(columns=df.iloc[0]).drop(df.index[0])
+
+@st.cache(suppress_st_warning=True)
+def get_data(url):
+    df = pd.read_html(url)[1]
+    df.dropna(axis=0, inplace=True)
+    df = df.rename(columns=df.iloc[0]).drop(df.index[0])
+    df['ticker'] = df['Company'].apply(lambda x: str(x).split(' ')[0])
+    df['Change Percent'] = df['Change Percent'].apply(
+        lambda x: x.split(' ')[0])
+    df['Company'] = df['Company'].apply(
+        lambda x: x.split(' ', 1)[1:][0].strip())
+    df = df[df['Current Price'].apply(lambda x: float(x)) < check_20]
+    df = df[df['ticker'].apply(lambda x: search.lower() in x.lower())]
+    cols = df.columns.tolist()
+    cols = cols[-1:] + cols[:-1]
+    df = df[cols]
+    return df
+
 # df['ticker'] = df['Company'].apply(lambda x: '<a href="https://in.tradingview.com/symbols/{0}-{1}">{1}</a>'.format(exch, x.split(' ')[0]))
-df['ticker'] = df['Company'].apply(lambda x: str(x).split(' ')[0])
-df['Change Percent'] = df['Change Percent'].apply(lambda x: x.split(' ')[0])
-df['Company'] = df['Company'].apply(
-    lambda x: x.split(' ', 1)[1:][0].strip())
-df = df[df['Current Price'].apply(lambda x: float(x)) < check_20]
-df = df[df['ticker'].apply(lambda x: search.lower() in x.lower())]
-cols = df.columns.tolist()
-cols = cols[-1:] + cols[:-1]
-df = df[cols]
+
 
 my_bar = st.progress(0)
+data_df = get_data(url)
 for complete in range(100):
     my_bar.progress(complete + 1)
     time.sleep(0.001)
-st.dataframe(df)
+st.dataframe(data_df)
 
 ex_date = datetime.now().strftime('%d-%m-%Y')
 
 
-@ st.cache(suppress_st_warning=True)
+@st.cache(suppress_st_warning=True)
 def get_dividend(type):
     year = datetime.now().year
     url = f"https://www.moneycontrol.com/stocks/marketinfo/{type}/index.php?sel_year={year}"
@@ -71,7 +79,7 @@ def get_dividend(type):
     return df
 
 
-@ st.cache(suppress_st_warning=True)
+@st.cache(suppress_st_warning=True)
 def get_bonus(type):
     year = datetime.now().year
     url = f"https://www.moneycontrol.com/stocks/marketinfo/{type}/index.php?sel_year={year}"
@@ -81,7 +89,7 @@ def get_bonus(type):
     return df
 
 
-@ st.cache(suppress_st_warning=True)
+@st.cache(suppress_st_warning=True)
 def get_splits(type):
     year = datetime.now().year
     url = f"https://www.moneycontrol.com/stocks/marketinfo/{type}/index.php?sel_year={year}"
@@ -92,7 +100,7 @@ def get_splits(type):
     return df
 
 
-@ st.cache(suppress_st_warning=True)
+@st.cache(suppress_st_warning=True)
 def get_rights(type):
     year = datetime.now().year
     url = f"https://www.moneycontrol.com/stocks/marketinfo/{type}/index.php?sel_year={year}"
