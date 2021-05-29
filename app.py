@@ -43,36 +43,33 @@ def get_data(url):
     df = pd.read_html(url)[1]
     df.dropna(axis=0, inplace=True)
     df = df.rename(columns=df.iloc[0]).drop(df.index[0])
-    df['ticker'] = df['Company'].apply(lambda x: str(x).split(' ')[0])
+    df['Ticker'] = df['Company'].apply(lambda x: str(x).split(' ')[0])
     df['Change Percent'] = df['Change Percent'].apply(
         lambda x: x.split(' ')[0])
     df['Company'] = df['Company'].apply(
         lambda x: x.split(' ', 1)[1:][0].strip())
     df = df[df['Current Price'].apply(lambda x: float(x)) < check_20]
-    df = df[df['ticker'].apply(lambda x: search.lower() in x.lower())]
+    df = df[df['Ticker'].apply(lambda x: search.lower() in x.lower())]
     cols = df.columns.tolist()
     cols = cols[-1:] + cols[:-1]
     df = df[cols]
+    df.rename(columns={'Change Percent': 'Change %',
+                       'Current Price': 'Curr. Price'}, inplace=True)
     return df
 
 # df['ticker'] = df['Company'].apply(lambda x: '<a href="https://in.tradingview.com/symbols/{0}-{1}">{1}</a>'.format(exch, x.split(' ')[0]))
 
 
-file_exist = f"{ex_date}.pickle"
-if os.path.exists(file_exist):
-    data_df = pd.read_pickle(file_exist)
-else:
-    data_df = get_data(url)
-    data_df.to_pickle('./{}'.format(file_exist))
-    yest_date = date.today() - timedelta(days=1)
-    yest_file = yest_date.strftime('%d-%m-%Y')
-    os.remove(f"{yest_file}.pickle")
-
 my_bar = st.progress(0)
+data_df = get_data(url)
 for complete in range(100):
     my_bar.progress(complete + 1)
     time.sleep(0.001)
-st.dataframe(data_df)
+st.dataframe(data_df.style.set_properties(**{
+    'background-color': 'light',
+    'font-size': '10pt',
+    'font': 'monaco'
+}))
 
 
 @st.cache(suppress_st_warning=True)
