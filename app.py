@@ -1,9 +1,9 @@
 from pandas.io.html import read_html
 import streamlit as st
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, date, timedelta
 import time
-
+import os
 
 st.image('./image.png', width=700)
 
@@ -18,6 +18,7 @@ def color_negative_red(value):
 
 
 website = "https://munafasutra.com/"
+ex_date = datetime.now().strftime('%d-%m-%Y')
 
 st.subheader("Gainers/Losers")
 col1, col2, col3, col4 = st.beta_columns(4)
@@ -57,14 +58,21 @@ def get_data(url):
 # df['ticker'] = df['Company'].apply(lambda x: '<a href="https://in.tradingview.com/symbols/{0}-{1}">{1}</a>'.format(exch, x.split(' ')[0]))
 
 
+file_exist = f"{ex_date}.pickle"
+if os.path.exists(file_exist):
+    data_df = pd.read_pickle(file_exist)
+else:
+    data_df = get_data(url)
+    data_df.to_pickle('./{}'.format(file_exist))
+    yest_date = date.today() - timedelta(days=1)
+    yest_file = yest_date.strftime('%d-%m-%Y')
+    os.remove(f"{yest_file}.pickle")
+
 my_bar = st.progress(0)
-data_df = get_data(url)
 for complete in range(100):
     my_bar.progress(complete + 1)
     time.sleep(0.001)
 st.dataframe(data_df)
-
-ex_date = datetime.now().strftime('%d-%m-%Y')
 
 
 @st.cache(suppress_st_warning=True)
