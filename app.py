@@ -18,7 +18,7 @@ def color_negative_red(value):
 
 
 website = "https://munafasutra.com/"
-ex_date = datetime.now().strftime('%d-%m-%Y')
+ex_date = datetime.now().strftime('%Y-%m-%d')
 
 st.subheader("Gainers/Losers")
 col1, col2, col3, col4 = st.beta_columns(4)
@@ -72,7 +72,7 @@ st.dataframe(data_df.style.set_properties(**{
 }))
 
 
-@st.cache(suppress_st_warning=True)
+# @st.cache(suppress_st_warning=True)
 def get_dividend(type):
     year = datetime.now().year
     url = f"https://www.moneycontrol.com/stocks/marketinfo/{type}/index.php?sel_year={year}"
@@ -81,10 +81,12 @@ def get_dividend(type):
     df[0] = df[0].apply(lambda x: x.split("Add")[0])
     df = df.rename(columns=df.iloc[1]).drop(df.index[0]).drop(df.index[1])
     df = df[pd.to_datetime(df['Ex-Dividend'], format='%d-%m-%Y') > ex_date]
+    print(df)
+    print(ex_date)
     return df
 
 
-@st.cache(suppress_st_warning=True)
+@ st.cache(suppress_st_warning=True)
 def get_bonus(type):
     year = datetime.now().year
     url = f"https://www.moneycontrol.com/stocks/marketinfo/{type}/index.php?sel_year={year}"
@@ -94,7 +96,7 @@ def get_bonus(type):
     return df
 
 
-@st.cache(suppress_st_warning=True)
+@ st.cache(suppress_st_warning=True)
 def get_splits(type):
     year = datetime.now().year
     url = f"https://www.moneycontrol.com/stocks/marketinfo/{type}/index.php?sel_year={year}"
@@ -105,7 +107,7 @@ def get_splits(type):
     return df
 
 
-@st.cache(suppress_st_warning=True)
+@ st.cache(suppress_st_warning=True)
 def get_rights(type):
     year = datetime.now().year
     url = f"https://www.moneycontrol.com/stocks/marketinfo/{type}/index.php?sel_year={year}"
