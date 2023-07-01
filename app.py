@@ -21,14 +21,14 @@ website = "https://munafasutra.com/"
 ex_date = datetime.now().strftime('%Y-%m-%d')
 
 st.subheader("Gainers/Losers")
-col1, col2, col3, col4 = st.beta_columns(4)
+col1, col2, col3, col4 = st.columns(4)
 exch = col1.selectbox("Exchange", ["nse", "bse"])
 stype = col2.selectbox("Type", ["GAINERS", "LOSERS"])
 value = col3.selectbox("Value", [1, 2, 3, 4, 5, 6])
 duration = col4.selectbox("Time", ["WEEKLY", "MONTHLY"])
 price_list = [20, 100, 300, 500, 100000]
 
-c1, c2 = st.beta_columns(2)
+c1, c2 = st.columns(2)
 check_20 = c1.selectbox("Stocks under", price_list,
                         index=price_list.index(100000))
 search = c2.text_input('Find Ticker')
@@ -38,7 +38,7 @@ else:
     url = website+"%s/top/%s/%s/%s" % (exch, stype, duration, str(value))
 
 
-@st.cache(suppress_st_warning=True)
+@st.cache_data()
 def get_data(url):
     df = pd.read_html(url)[1]
     df.dropna(axis=0, inplace=True)
