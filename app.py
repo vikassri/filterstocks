@@ -66,7 +66,6 @@ for complete in range(100):
     my_bar.progress(complete + 1)
     time.sleep(0.001)
 st.dataframe(data_df.style.set_properties(**{
-    'background-color': 'light',
     'font-size': '10pt',
     'font': 'monaco'
 }))
