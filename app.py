@@ -38,8 +38,7 @@ else:
     url = website+"%s/top/%s/%s/%s" % (exch, stype, duration, str(value))
 
 
-@st.cache_data()
-def get_data(url):
+def get_stocks(url):
     df = pd.read_html(url)[1]
     df.dropna(axis=0, inplace=True)
     df = df.rename(columns=df.iloc[0]).drop(df.index[0])
@@ -57,64 +56,22 @@ def get_data(url):
                        'Current Price': 'Curr. Price'}, inplace=True)
     return df
 
-# df['ticker'] = df['Company'].apply(lambda x: '<a href="https://in.tradingview.com/symbols/{0}-{1}">{1}</a>'.format(exch, x.split(' ')[0]))
-
-
 my_bar = st.progress(0)
-data_df = get_data(url)
+data_df = get_stocks(url)
 for complete in range(100):
     my_bar.progress(complete + 1)
     time.sleep(0.001)
 st.dataframe(data_df.style.set_properties(**{
+    'background-color': 'white',
     'font-size': '10pt',
     'font': 'monaco'
 }))
 
 
-# @st.cache(suppress_st_warning=True)
-def get_dividend(type):
-    year = datetime.now().year
-    url = f"https://www.moneycontrol.com/stocks/marketinfo/{type}/index.php?sel_year={year}"
-    tables = pd.read_html(url)
-    df = tables[1]
-    df[0] = df[0].apply(lambda x: x.split("Add")[0])
-    df = df.rename(columns=df.iloc[1]).drop(df.index[0]).drop(df.index[1])
-    df = df[pd.to_datetime(df['Ex-Dividend'], format='%d-%m-%Y') > ex_date]
-    print(df)
-    print(ex_date)
-    return df
-
-
-@ st.cache(suppress_st_warning=True)
-def get_bonus(type):
-    year = datetime.now().year
-    url = f"https://www.moneycontrol.com/stocks/marketinfo/{type}/index.php?sel_year={year}"
-    df = pd.read_html(url)[1]
-    df = df.rename(columns=df.iloc[1]).drop(df.index[1]).drop(df.index[0])
-    df = df[pd.to_datetime(df['Ex-Bonus'], format='%d-%m-%Y') > ex_date]
-    return df
-
-
-@ st.cache(suppress_st_warning=True)
-def get_splits(type):
-    year = datetime.now().year
-    url = f"https://www.moneycontrol.com/stocks/marketinfo/{type}/index.php?sel_year={year}"
-    df = pd.read_html(url)[1]
-    df[0] = df[0].apply(lambda x: x.split("Add")[0])
-    df = df.rename(columns=df.iloc[0]).drop(df.index[0])
-    df = df[pd.to_datetime(df['Split Date'], format='%d-%m-%Y') > ex_date]
-    return df
-
-
-@ st.cache(suppress_st_warning=True)
-def get_rights(type):
-    year = datetime.now().year
-    url = f"https://www.moneycontrol.com/stocks/marketinfo/{type}/index.php?sel_year={year}"
-    tables = pd.read_html(url)
-    df = tables[1]
-    df[0] = df[0].apply(lambda x: x.split("Add")[0])
-    df = df.rename(columns=df.iloc[1]).drop(df.index[0]).drop(df.index[1])
-    df = df[pd.to_datetime(df['Ex-Rights'], format='%d-%m-%y') > ex_date]
+@st.cache_data()
+def get_data(type):
+    url = f"https://www.5paisa.com/share-market-today/{type}"
+    df = pd.read_html(url)[0]
     return df
 
 
@@ -122,7 +79,7 @@ st.markdown(''' --- ''')
 bonus = st.checkbox("Bonus Details")
 if bonus:
     my_bar = st.progress(0)
-    bonusDF = get_bonus('bonus')
+    bonusDF = get_data('bonus')
     if not bonusDF.empty:
         for complete in range(100):
             my_bar.progress(complete + 1)
@@ -138,7 +95,7 @@ st.markdown(''' --- ''')
 split = st.checkbox("Splits Details")
 if split:
     my_bar = st.progress(0)
-    splitDF = get_splits('splits')
+    splitDF = get_data('splits')
     if not splitDF.empty:
         for complete in range(100):
             my_bar.progress(complete + 1)
@@ -154,7 +111,7 @@ st.markdown(''' --- ''')
 right = st.checkbox("Rights Details")
 if right:
     my_bar = st.progress(0)
-    rightsDF = get_rights('rights')
+    rightsDF = get_data('rights')
     if not rightsDF.empty:
         for complete in range(100):
             my_bar.progress(complete + 1)
@@ -170,7 +127,7 @@ st.markdown(''' --- ''')
 dividend = st.checkbox("Dividend Details")
 if dividend:
     my_bar = st.progress(0)
-    dvdf = get_dividend('dividends_declared')
+    dvdf = get_data('dividends')
     if not dvdf.empty:
         for complete in range(100):
             my_bar.progress(complete + 1)
@@ -203,5 +160,5 @@ st.markdown('''
             ###
             ---
             \n \n \n \n \n \n
-             Made by ** Vikas Srivastava **
+             Made by **Vikas Srivastava**
             ''')
