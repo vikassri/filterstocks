@@ -38,7 +38,8 @@ else:
     url = website+"%s/top/%s/%s/%s" % (exch, stype, duration, str(value))
 
 
-def get_stocks(url):
+@st.cache(suppress_st_warning=True)
+def get_data(url):
     df = pd.read_html(url)[2]
     df.dropna(axis=0, inplace=True)
     df = df.rename(columns=df.iloc[0]).drop(df.index[0])
@@ -160,5 +161,5 @@ st.markdown('''
             ###
             ---
             \n \n \n \n \n \n
-             Made by ** Vikas Srivastava **
+             Made by **Vikas Srivastava**
             ''')
