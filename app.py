@@ -38,8 +38,7 @@ else:
     url = website+"%s/top/%s/%s/%s" % (exch, stype, duration, str(value))
 
 
-@st.cache(suppress_st_warning=True)
-def get_data(url):
+def get_stocks(url):
     df = pd.read_html(url)[2]
     df.dropna(axis=0, inplace=True)
     df = df.rename(columns=df.iloc[0]).drop(df.index[0])
